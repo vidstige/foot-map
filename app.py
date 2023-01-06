@@ -73,7 +73,7 @@ class Plane:
         # compute u, v components
         u0 = np.dot(u, p - o).item()
         v0 = np.dot(v, p - o).item()
-        return (1000 * u0 + 100, 1000 * v0 + 400)
+        return (2000 * u0 + 200, 2000 * v0 + 800)
 
 
 @app.route('/<external_link:external_link>/')
@@ -82,9 +82,9 @@ def foot_map(external_link: str):
     r.raise_for_status()
     vertices, faces = parse_wavefront(io.StringIO(r.content.decode()))
 
-    h = 0.01
+    h = 0.005
     dwg = svgwrite.Drawing('{external_link}.svg')
-    for offset in np.arange(0.0, 0.10, h):
+    for offset in np.arange(h, 0.10, h):
         plane = Plane(origin=(0.0, 0.0, offset), normal=(0, 0, 1))
         # compute conturs at offset
         contours = meshcut.cross_section(
