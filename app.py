@@ -1,5 +1,4 @@
 import io
-from tempfile import NamedTemporaryFile
 from typing import Tuple
 
 from flask import Flask, jsonify, Response
@@ -82,18 +81,19 @@ def foot_map(external_link: str):
     r = requests.get(f'https://my.volumental.com/uploads/{external_link}/left.obj')
     r.raise_for_status()
     vertices, faces = parse_wavefront(io.StringIO(r.content.decode()))
-    plane = Plane(origin=(0.0, 0.0, 0.02), normal=(0, 0, 1))
-    contours = meshcut.cross_section(
-        vertices, faces,
-        plane_orig=plane.origin, plane_normal=plane.normal)
 
-    with NamedTemporaryFile(suffix='svg') as tmp:
-        dwg = svgwrite.Drawing(tmp.name)
-        
+    h = 0.01
+    dwg = svgwrite.Drawing('{external_link}.svg')
+    for offset in np.arange(0.0, 0.10, h):
+        plane = Plane(origin=(0.0, 0.0, offset), normal=(0, 0, 1))
+        # compute conturs at offset
+        contours = meshcut.cross_section(
+            vertices, faces,
+            plane_orig=plane.origin, plane_normal=plane.normal)
         for contour in contours:
             points = [plane.project(p) for p in contour]
             dwg.add(dwg.polygon(points, stroke=svgwrite.rgb(10, 10, 16, '%'), fill='none'))
 
-        #dwg.add(dwg.text('vidstige', insert=(0, 0.2), fill='red'))
+    #dwg.add(dwg.text('vidstige', insert=(0, 0.2), fill='red'))
 
-        return Response(dwg.tostring(), content_type="image/svg+xml")
+    return Response(dwg.tostring(), content_type="image/svg+xml")
