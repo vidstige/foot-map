@@ -2,7 +2,7 @@ import io
 from typing import Tuple
 import xml.etree.ElementTree as ET
 
-from flask import Flask, jsonify, Response
+from flask import Flask, jsonify, Response, request
 import meshcut
 import numpy as np
 import requests
@@ -93,12 +93,12 @@ def grid_lines(dwg: svgwrite.Drawing, spacing: Tuple[float, float], **extra) -> 
 
 
 @app.route('/<external_link:external_link>/')
-def foot_map(external_link: str):
+def foot_map(external_link: str) -> Response:
+    h = float(request.args.get('h', '0.005'))
     r = requests.get(f'https://my.volumental.com/uploads/{external_link}/left.obj')
     r.raise_for_status()
     vertices, faces = parse_wavefront(io.StringIO(r.content.decode()))
 
-    h = 0.005
     dwg = svgwrite.Drawing('{external_link}.svg', size=A4, viewBox="0 0 0.210 0.297")
     
     group = svgwrite.container.Group(transform='translate(0.1, 0.275)')
