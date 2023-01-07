@@ -63,7 +63,6 @@ class Plane:
         o = np.array(self.origin)
         p = np.array(point)
         # create arbtitary u,v basis vectors in the plane
-        print(n)
         if np.isclose(n[0], 0):
             u = normalized(np.array([n[2], -n[1], 0]))
         else:
