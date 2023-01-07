@@ -77,6 +77,20 @@ class Plane:
         v0 = np.dot(v, p - o).item()
         return u0, v0
 
+
+def grid_lines(dwg: svgwrite.Drawing, spacing: Tuple[float, float], **extra) -> svgwrite.container.Group:
+    spacing_x, spacing_y = spacing
+    group = svgwrite.container.Group()
+    minx, miny, width, height = [float(c) for c in dwg['viewBox'].split()]
+    # draw vertical lines
+    for x in np.arange(minx, minx + width, spacing_x):
+        group.add(dwg.line((x, miny), (x, miny + height), **extra))
+    # draw horizontal lines
+    for y in np.arange(miny, miny + height, spacing_y):
+        group.add(dwg.line((minx, y), (minx + width, y), **extra))
+    return group
+
+
 @app.route('/<external_link:external_link>/')
 def foot_map(external_link: str):
     r = requests.get(f'https://my.volumental.com/uploads/{external_link}/left.obj')
@@ -85,6 +99,7 @@ def foot_map(external_link: str):
 
     h = 0.005
     dwg = svgwrite.Drawing('{external_link}.svg', size=A4, viewBox="0 0 0.210 0.297")
+    dwg.add(grid_lines(dwg, spacing=(0.01, 0.01), stroke=svgwrite.rgb(40, 40, 46, '%'), stroke_width='0.0002'))
     group = svgwrite.container.Group(transform='translate(0.1, 0.275)')
     dwg.add(group)
     for offset in np.arange(h, 0.10, h):
