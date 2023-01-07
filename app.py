@@ -9,6 +9,9 @@ import svgwrite
 from werkzeug.routing import BaseConverter
 
 
+A4 = ('210mm', '297mm')
+
+
 class ExternalLinkConverter(BaseConverter):
     regex = r'[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}'
 
@@ -72,8 +75,7 @@ class Plane:
         # compute u, v components
         u0 = np.dot(u, p - o).item()
         v0 = np.dot(v, p - o).item()
-        return (2000 * u0 + 200, 2000 * v0 + 800)
-
+        return u0, v0
 
 @app.route('/<external_link:external_link>/')
 def foot_map(external_link: str):
@@ -82,7 +84,9 @@ def foot_map(external_link: str):
     vertices, faces = parse_wavefront(io.StringIO(r.content.decode()))
 
     h = 0.005
-    dwg = svgwrite.Drawing('{external_link}.svg')
+    dwg = svgwrite.Drawing('{external_link}.svg', size=A4, viewBox="0 0 0.210 0.297")
+    group = svgwrite.container.Group(transform='translate(0.1, 0.275)')
+    dwg.add(group)
     for offset in np.arange(h, 0.10, h):
         plane = Plane(origin=(0.0, 0.0, offset), normal=(0, 0, 1))
         # compute conturs at offset
@@ -91,8 +95,10 @@ def foot_map(external_link: str):
             plane_orig=plane.origin, plane_normal=plane.normal)
         for contour in contours:
             points = [plane.project(p) for p in contour]
-            dwg.add(dwg.polygon(points, stroke=svgwrite.rgb(10, 10, 16, '%'), fill='none'))
+            group.add(dwg.polygon(points, stroke=svgwrite.rgb(10, 10, 16, '%'), stroke_width='0.0005', fill='none'))
+
 
     #dwg.add(dwg.text('vidstige', insert=(0, 0.2), fill='red'))
 
     return Response(dwg.tostring(), content_type="image/svg+xml")
+
