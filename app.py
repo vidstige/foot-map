@@ -100,7 +100,7 @@ def foot_map(external_link: str):
 
     h = 0.005
     dwg = svgwrite.Drawing('{external_link}.svg', size=A4, viewBox="0 0 0.210 0.297")
-    dwg.add(grid_lines(dwg, spacing=(0.01, 0.01), stroke=svgwrite.rgb(40, 40, 46, '%'), stroke_width='0.0002'))
+    
     group = svgwrite.container.Group(transform='translate(0.1, 0.275)')
     dwg.add(group)
     for offset in np.arange(h, 0.10, h):
@@ -113,10 +113,14 @@ def foot_map(external_link: str):
             points = [plane.project(p) for p in contour]
             group.add(dwg.polygon(points, stroke=svgwrite.rgb(10, 10, 16, '%'), stroke_width='0.0005', fill='white', fill_opacity=0.05))
 
+    dwg.add(grid_lines(dwg, spacing=(0.01, 0.01), stroke=svgwrite.rgb(40, 40, 46, '%'), stroke_width='0.0002'))
+
+    dwg.add(dwg.rect((0.005, 0.005), (0.055, 0.01), fill='white', stroke='black', stroke_width='0.0002'))
+    dwg.add(dwg.text("External link".upper(), insert=(0.007, 0.009), font_size="0.0025", fill='black'))
+    dwg.add(dwg.text(external_link.upper(), insert=(0.007, 0.013), font_size="0.0025", fill='black'))
+
     # add metadata
     dwg.set_metadata(ET.Element('vandra-scan', attrib={'external-link': external_link}))
-
-    #dwg.add(dwg.text('vidstige', insert=(0, 0.2), fill='red'))
 
     return Response(dwg.tostring(), content_type="image/svg+xml")
 
