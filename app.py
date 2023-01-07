@@ -95,8 +95,7 @@ def foot_map(external_link: str):
             plane_orig=plane.origin, plane_normal=plane.normal)
         for contour in contours:
             points = [plane.project(p) for p in contour]
-            group.add(dwg.polygon(points, stroke=svgwrite.rgb(10, 10, 16, '%'), stroke_width='0.0005', fill='none'))
-
+            group.add(dwg.polygon(points, stroke=svgwrite.rgb(10, 10, 16, '%'), stroke_width='0.0005', fill='white', fill_opacity=0.05))
 
     #dwg.add(dwg.text('vidstige', insert=(0, 0.2), fill='red'))
 
