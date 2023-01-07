@@ -116,7 +116,7 @@ def foot_map(external_link: str) -> Response:
     dwg.add(grid_lines(dwg, spacing=(0.01, 0.01), stroke=svgwrite.rgb(40, 40, 46, '%'), stroke_width='0.0002'))
 
     dwg.add(dwg.rect((0.005, 0.005), (0.055, 0.01), fill='white', stroke='black', stroke_width='0.0002'))
-    dwg.add(dwg.text("External link".upper(), insert=(0.007, 0.009), font_size="0.0025", fill='black'))
+    dwg.add(dwg.text("vandra scan id".upper(), insert=(0.007, 0.009), font_size="0.0025", fill='black'))
     dwg.add(dwg.text(external_link.upper(), insert=(0.007, 0.013), font_size="0.0025", fill='black'))
 
     # add metadata
