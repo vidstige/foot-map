@@ -1,5 +1,6 @@
 import io
 from typing import Tuple
+import xml.etree.ElementTree as ET
 
 from flask import Flask, jsonify, Response
 import meshcut
@@ -111,6 +112,9 @@ def foot_map(external_link: str):
         for contour in contours:
             points = [plane.project(p) for p in contour]
             group.add(dwg.polygon(points, stroke=svgwrite.rgb(10, 10, 16, '%'), stroke_width='0.0005', fill='white', fill_opacity=0.05))
+
+    # add metadata
+    dwg.set_metadata(ET.Element('vandra-scan', attrib={'external-link': external_link}))
 
     #dwg.add(dwg.text('vidstige', insert=(0, 0.2), fill='red'))
 
